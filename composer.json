@@ -1,0 +1,16 @@
+{
+    "name": "vladmeh/stream-task-shedule",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "vladmeh",
+            "email": "vladmeh@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}
