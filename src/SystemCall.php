@@ -22,6 +22,4 @@ class SystemCall
         $callback = $this->callback;
         return $callback($task, $scheduler);
     }
-
-
 }
