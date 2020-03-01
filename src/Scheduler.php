@@ -43,7 +43,12 @@ class Scheduler
     public function run() {
         while (!$this->taskQueue->isEmpty()) {
             $task = $this->taskQueue->dequeue();
-            $task->run();
+            $retval = $task->run();
+
+            if ($retval instanceof SystemCall){
+                $retval($task, $this);
+                continue;
+            }
 
             if ($task->isFinished()) {
                 unset($this->taskMap[$task->getTaskId()]);
@@ -51,5 +56,23 @@ class Scheduler
                 $this->schedule($task);
             }
         }
+    }
+
+    public function killTask($tid)
+    {
+        if (!isset($this->taskMap[$tid])){
+            return false;
+        }
+
+        unset($this->taskMap[$tid]);
+
+        foreach ($this->taskQueue as $i => $task) {
+            if ($task->getTaskId() === $tid){
+                unset($this->taskQueue[$i]);
+                break;
+            }
+        }
+
+        return true;
     }
 }
