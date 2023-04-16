@@ -29,6 +29,10 @@ class WebServerScheduler extends Scheduler
     }
 
     protected function ioPoll($timeout) {
+        if (empty($this->waitingForRead) && empty($this->waitingForWrite)) {
+            return;
+        }
+
         $rSocks = [];
         foreach ($this->waitingForRead as list($socket)) {
             $rSocks[] = $socket;
