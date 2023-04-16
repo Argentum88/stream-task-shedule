@@ -48,7 +48,7 @@ RES;
     fclose($socket);
 }
 
-$scheduler = new Scheduler;
+$scheduler = new WebServerScheduler();
 try {
     $scheduler->newTask(server(8000));
 } catch (Exception $e) {
