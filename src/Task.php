@@ -28,7 +28,7 @@ class Task
     public function __construct(int $taskId, Generator $coroutine)
     {
         $this->taskId = $taskId;
-        $this->coroutine = $coroutine;
+        $this->coroutine = $this->stackedCoroutine($coroutine);
     }
 
     /**
@@ -71,5 +71,32 @@ class Task
     public function isFinished(): bool
     {
         return !$this->coroutine->valid();
+    }
+
+    private function stackedCoroutine(Generator $gen) {
+        $stack = new SplStack;
+
+        for (;;) {
+            $value = $gen->current();
+
+            if ($value instanceof Generator) {
+                $stack->push($gen);
+                $gen = $value;
+                continue;
+            }
+
+            $isReturnValue = $value instanceof CoroutineReturnValue;
+            if (!$gen->valid() || $isReturnValue) {
+                if ($stack->isEmpty()) {
+                    return;
+                }
+
+                $gen = $stack->pop();
+                $gen->send($isReturnValue ? $value->getValue() : NULL);
+                continue;
+            }
+
+            $gen->send(yield $gen->key() => $value);
+        }
     }
 }
